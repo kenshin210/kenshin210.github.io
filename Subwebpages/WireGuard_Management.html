@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Titan's Wireguard</title>
+  <link rel="stylesheet" href="../CSS/styles.css"/>
+  <style>
+    /* Quick custom style adjustment for this specific embedded frame view */
+    .embedded-container {
+      width: 100%;
+      height: calc(100vh - 120px); /* Fills the rest of the screen below topbar */
+      border: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #000000;
+      box-shadow: var(--shadow);
+    }
+
+    .embedded-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <div id="sidebar-container"></div>
+  
+  <main class="main">
+
+    <div class="topbar">
+      <div>
+        <strong>Wireguard Management</strong>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card col-12 embedded-container">
+        <iframe 
+          src="" 
+          title="Live Cockpit Panel"
+          class="embedded-frame">
+        </iframe>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+    fetch('/SideNavigation/sidebar.html') 
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('sidebar-container').innerHTML = data;
+
+            let currentPage = window.location.pathname.split('/').pop().toLowerCase();
+            if (currentPage === "") {
+                currentPage = "overview.html";
+            }
+
+            const navLinks = document.querySelectorAll('.sidebar-link');
+
+            navLinks.forEach(link => {
+                const targetPage = link.getAttribute('href').split('/').pop().toLowerCase();
+                const navItem = link.querySelector('.nav-item');
+                
+                if (navItem) {
+                    if (currentPage === targetPage) {
+                        navItem.classList.add('active');
+                    } else {
+                        navItem.classList.remove('active');
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error loading the sidebar:', error));
+</script>
+</body>
+</html>

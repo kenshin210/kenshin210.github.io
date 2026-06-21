@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Titan's Overview</title>
+  <link rel="stylesheet" href="CSS/styles.css"/>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <!-- Sidebar -->
+   <div id="sidebar-container"></div>
+  
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <strong>Overview</strong>
+      </div>
+
+      
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid">
+
+      <div class="card col-3">
+        <h3>CPU Usage</h3>
+        <div class="value">32%</div>
+      </div>
+
+      <div class="card col-3">
+        <h3>Memory</h3>
+        <div class="value">12.4 GB</div>
+      </div>
+
+      <div class="card col-3">
+        <h3>Network</h3>
+        <div class="value">180 Mbps</div>
+      </div>
+
+      <div class="card col-3">
+        <h3>Uptime</h3>
+        <div class="value">99.98%</div>
+      </div>
+
+    </div>
+
+    <!-- Charts / Widgets Row -->
+    <div class="grid">
+
+      <div class="card col-8">
+        <h3>System Load</h3>
+        <p style="color: var(--muted);">
+          (Chart placeholder — integrate Chart.js or ECharts here)
+        </p>
+        <div style="height: 250px; background: rgba(255,255,255,0.03); border-radius: 12px;"></div>
+      </div>
+
+      <div class="card col-4">
+        <h3>Alerts</h3>
+
+        <p class="badge warning">High CPU detected</p><br><br>
+        <p class="badge success">Backup completed</p><br><br>
+        <p class="badge danger">Disk usage > 90%</p>
+      </div>
+
+    </div>
+
+    <!-- Table Section -->
+    <div class="grid">
+
+      <div class="card col-12">
+
+        <h3>Recent Activity</h3>
+
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Action</th>
+              <th>Status</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>Admin</td>
+              <td>Updated firewall rules</td>
+              <td><span class="badge success">Success</span></td>
+              <td>10:32 AM</td>
+            </tr>
+
+            <tr>
+              <td>System</td>
+              <td>Auto backup</td>
+              <td><span class="badge success">Success</span></td>
+              <td>09:15 AM</td>
+            </tr>
+
+            <tr>
+              <td>Monitor</td>
+              <td>CPU spike detected</td>
+              <td><span class="badge warning">Warning</span></td>
+              <td>08:50 AM</td>
+            </tr>
+
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>
+<script>
+    fetch('/SideNavigation/sidebar.html') 
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('sidebar-container').innerHTML = data;
+
+            // 1. Get the clean, lowercase page name (handling empty root as overview)
+            let currentPage = window.location.pathname.split('/').pop().toLowerCase();
+            if (currentPage === "") {
+                currentPage = "overview.html"; // Default fallback for root URLs
+            }
+
+            // 2. Find all your navigation links
+            const navLinks = document.querySelectorAll('.sidebar-link');
+
+            navLinks.forEach(link => {
+                const targetPage = link.getAttribute('href').split('/').pop().toLowerCase();
+                
+                // 3. Find the inner nav item container
+                const navItem = link.querySelector('.nav-item');
+                
+                if (navItem) {
+                    if (currentPage === targetPage) {
+                        navItem.classList.add('active');
+                    } else {
+                        // Explicitly strip active away from non-matching items
+                        navItem.classList.remove('active');
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error loading the sidebar:', error));
+</script>
+</body>
+</html>
