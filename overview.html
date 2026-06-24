@@ -4,155 +4,397 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Titan's Overview</title>
+
   <link rel="stylesheet" href="CSS/styles.css"/>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
 <div class="dashboard">
 
-  <!-- Sidebar -->
-   <div id="sidebar-container"></div>
-  
+  <div id="sidebar-container"></div>
 
-  <!-- Main Content -->
   <main class="main">
 
-    <!-- Topbar -->
     <div class="topbar">
-      <div>
-        <strong>Overview</strong>
-      </div>
-
-      
+      <strong>Overview</strong>
     </div>
 
-    <!-- KPI Cards -->
     <div class="grid">
 
       <div class="card col-3">
         <h3>CPU Usage</h3>
-        <div class="value">32%</div>
+        <div class="value" id="cpu-usage">--%</div>
       </div>
 
       <div class="card col-3">
-        <h3>Memory</h3>
-        <div class="value">12.4 GB</div>
+        <h3>CPU Temp</h3>
+        <div id="temp-display">--°C</div>
+      </div>
+
+      <div class="card col-3">
+        <h3>RAM In Use / Total</h3>
+        <div id="memory-gb">--%</div>
       </div>
 
       <div class="card col-3">
         <h3>Network</h3>
-        <div class="value">180 Mbps</div>
+        <div id="network-usage">-- Mbps</div>
+      </div>
+
+    </div>
+
+    <div class="grid">
+
+      <div class="card col-3">
+        <h3>GPU Usage</h3>
+        <div id="gpu-usage">--%</div>
       </div>
 
       <div class="card col-3">
-        <h3>Uptime</h3>
-        <div class="value">99.98%</div>
+        <h3>GPU Temp</h3>
+        <div id="gpu-temp-display">--°C</div>
+      </div>
+
+      <div class="card col-3">
+        <h3>VRAM Usage</h3>
+        <div id="vram-usage">--%</div>
+      </div>
+
+      <div class="card col-3">
+        <h3>Memory Used</h3>
+        <div id="memory-percent">-- GB</div>
       </div>
 
     </div>
 
-    <!-- Charts / Widgets Row -->
     <div class="grid">
 
-      <div class="card col-8">
-        <h3>System Load</h3>
-        <p style="color: var(--muted);">
-          (Chart placeholder — integrate Chart.js or ECharts here)
-        </p>
-        <div style="height: 250px; background: rgba(255,255,255,0.03); border-radius: 12px;"></div>
+      <div class="card col-6">
+        <h3>CPU Load (Per Core)</h3>
+        <canvas id="cpuGraph" height="100"></canvas>
       </div>
 
-      <div class="card col-4">
-        <h3>Alerts</h3>
-
-        <p class="badge warning">High CPU detected</p><br><br>
-        <p class="badge success">Backup completed</p><br><br>
-        <p class="badge danger">Disk usage > 90%</p>
+      <div class="card col-6">
+        <h3>Memory Usage</h3>
+        <canvas id="memoryGraph" height="100"></canvas>
       </div>
 
     </div>
 
-    <!-- Table Section -->
     <div class="grid">
 
+      <div class="card col-6">
+        <h3>GPU Load</h3>
+        <canvas id="gpuGraph" height="100"></canvas>
+      </div>
+
+      <div class="card col-6">
+        <h3>Network Usage</h3>
+        <canvas id="networkGraph" height="100"></canvas>
+      </div>
+
+    </div>
+
+    <div class="grid">
       <div class="card col-12">
-
-        <h3>Recent Activity</h3>
-
-        <table>
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Action</th>
-              <th>Status</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td>Admin</td>
-              <td>Updated firewall rules</td>
-              <td><span class="badge success">Success</span></td>
-              <td>10:32 AM</td>
-            </tr>
-
-            <tr>
-              <td>System</td>
-              <td>Auto backup</td>
-              <td><span class="badge success">Success</span></td>
-              <td>09:15 AM</td>
-            </tr>
-
-            <tr>
-              <td>Monitor</td>
-              <td>CPU spike detected</td>
-              <td><span class="badge warning">Warning</span></td>
-              <td>08:50 AM</td>
-            </tr>
-
-          </tbody>
-        </table>
-
+        <h3>Alerts</h3>
+        <p class="badge warning"></p><br>
+        <p class="badge success"></p><br>
+        <p class="badge danger"></p>
       </div>
-
     </div>
 
   </main>
 </div>
+
 <script>
-    fetch('/SideNavigation/sidebar.html') 
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('sidebar-container').innerHTML = data;
-
-            // 1. Get the clean, lowercase page name (handling empty root as overview)
-            let currentPage = window.location.pathname.split('/').pop().toLowerCase();
-            if (currentPage === "") {
-                currentPage = "overview.html"; // Default fallback for root URLs
-            }
-
-            // 2. Find all your navigation links
-            const navLinks = document.querySelectorAll('.sidebar-link');
-
-            navLinks.forEach(link => {
-                const targetPage = link.getAttribute('href').split('/').pop().toLowerCase();
-                
-                // 3. Find the inner nav item container
-                const navItem = link.querySelector('.nav-item');
-                
-                if (navItem) {
-                    if (currentPage === targetPage) {
-                        navItem.classList.add('active');
-                    } else {
-                        // Explicitly strip active away from non-matching items
-                        navItem.classList.remove('active');
-                    }
-                }
-            });
-        })
-        .catch(error => console.error('Error loading the sidebar:', error));
+/**
+ * Component Injection Module: Navigation Architecture 
+ * Asynchronously pulls shared, central sidebar source markup to update navigation 
+ * blocks modularly across multi-page layouts without replicating static code.
+ */
+fetch('./SideNavigation/sidebar.html')
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('sidebar-container').innerHTML = html;
+  });
 </script>
+
+<script>
+// ================== DATA PROCESSING & CAPTURE LAYER ==================
+
+/* Network Calculation Base Registers: 
+   Stores trailing byte indexes and high-resolution timestamps to calculate transactional rate deltas */
+let lastBytesSent = 0;
+let lastBytesRecv = 0;
+let lastTime = Date.now();
+
+/**
+ * Functional Routine: Thermals Aggregator
+ * Dispatches an asynchronous request to target node server to parse core motherboard packaging 
+ * thermal telemetry data, formatting the resulting floating-point values into localized UI elements.
+ */
+function fetchTemperature() {
+  fetch('http://10.69.0.2:5000/api/temp')
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('temp-display').innerText =
+        data.temperature.toFixed(1) + '°C';
+    });
+}
+
+// ---------- SYSTEM CPU PROCESSING AND DECOMPOSITION SUBMODULE ----------
+let cpuChart; // Keeps global lifecycle context handler for the active ChartJS CPU interface pointer
+
+/**
+ * Logic Module: CPU Graphic Allocator
+ * Constructs a multi-dataset Chart.js line framework mapped precisely to host layout cores.
+ * Colors elements across a spectrum using HSL distribution steps to visually separate cores.
+ */
+function initCPUChart(coreCount) {
+  const ctx = document.getElementById('cpuGraph').getContext('2d');
+
+  cpuChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: Array.from({ length: coreCount }, (_, i) => ({
+        label: `Core ${i}`,
+        data: [],
+        borderColor: `hsl(${i * 40}, 80%, 50%)`, // Automatically steps line hue bounds relative to thread totals
+        tension: 0.3
+      }))
+    },
+    options: {
+      animation: false, // Disables configuration animations to conserve browser performance during high-frequency telemetry cycles
+      scales: { y: { min: 0, max: 100 } } // Locks the coordinate graph to a rigid 0-100 percentage viewport boundary
+    }
+  });
+}
+
+/**
+ * Logic Module: CPU Graph Stream Processor
+ * Injects latest temporal tags and multi-core metrics down individual plot arrays.
+ * Employs a rolling First-In, First-Out (FIFO) buffer mechanism tracking 20 index periods to truncate trailing data points.
+ */
+function updateCPUChart(perCore) {
+  const time = new Date().toLocaleTimeString();
+
+  cpuChart.data.labels.push(time);
+
+  perCore.forEach((v, i) => {
+    cpuChart.data.datasets[i].data.push(v);
+  });
+
+  // Rolling cache management: drops outdated indexes to limit browser footprint leaks
+  if (cpuChart.data.labels.length > 20) {
+    cpuChart.data.labels.shift();
+    cpuChart.data.datasets.forEach(d => d.data.shift());
+  }
+
+  cpuChart.update(); // Signals ChartJS view layout re-renders with fresh internal data coordinates
+}
+
+/**
+ * Functional Routine: Central Processor Pipeline
+ * Queries global utilization parameters; handles lazy-initialization logic maps 
+ * if core count configurations are undefined upon primary payload arrivals.
+ */
+function fetchCPU() {
+  fetch('http://10.69.0.2:5000/api/cpu')
+    .then(r => r.json())
+    .then(data => {
+
+      document.getElementById('cpu-usage').innerText =
+        data.overall.toFixed(1) + '%';
+
+      // Lazy instantiation safety checkpoint checks array configurations 
+      if (!cpuChart) initCPUChart(data.per_core.length);
+
+      updateCPUChart(data.per_core);
+    });
+}
+
+// ---------- VOLATILE MEMORY ALLOCATIONS SUBMODULE ----------
+let memChart; // Keeps global lifecycle context handler for the active ChartJS Memory interface pointer
+
+/**
+ * Logic Module: RAM Graphic Allocator
+ * Constructs a singular-dataset performance map targeting volatile global memory arrays.
+ */
+function initMemoryChart() {
+  const ctx = document.getElementById('memoryGraph').getContext('2d');
+
+  memChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Memory %',
+        data: [],
+        borderColor: 'blue',
+        tension: 0.3
+      }]
+    },
+    options: {
+      animation: false,
+      scales: { y: { min: 0, max: 100 } }
+    }
+  });
+}
+
+/**
+ * Logic Module: RAM Graph Stream Processor
+ * Appends localized operational values down the memory data register, slicing indexes past threshold boundaries.
+ */
+function updateMemoryChart(val) {
+  const time = new Date().toLocaleTimeString();
+
+  memChart.data.labels.push(time);
+  memChart.data.datasets[0].data.push(val);
+
+  if (memChart.data.labels.length > 20) {
+    memChart.data.labels.shift();
+    memChart.data.datasets[0].data.shift();
+  }
+
+  memChart.update();
+}
+
+/**
+ * Functional Routine: Volatile Memory Pipeline
+ * Controls raw byte transformations ($1024^3$ binary scaling) to parse standard metrics 
+ * into readable Gigabyte (GB) layout labels, adjusting proportional utilization bars dynamically.
+ */
+function fetchMemory() {
+  fetch('http://10.69.0.2:5000/api/memory')
+    .then(r => r.json())
+    .then(data => {
+
+      // Note: mapping targets 'memory-percent' element ID to expose GB string variables. Check mapping logic dependencies if labels flip.
+      document.getElementById('memory-percent').innerText =
+        data.percent.toFixed(1) + '%';
+
+      // Transforms base server numerical bytes arrays directly into Gigabyte strings via standard binary bitwise scaling steps
+      document.getElementById('memory-gb').innerText =
+        `${(data.used / 1024**3).toFixed(2)} GB / ${(data.total / 1024**3).toFixed(2)} GB `;
+
+      if (!memChart) initMemoryChart();
+
+      updateMemoryChart(data.percent);
+    });
+}
+
+// ---------- ASYNCHRONOUS NETWORK PIPELINE SUBMODULE ----------
+let netChart; // Keeps global lifecycle context handler for the active ChartJS Network interface pointer
+
+/**
+ * Logic Module: Network Graphic Allocator
+ * Maps independent multi-tiered tracking lines splitting Upload and Download streams 
+ * inside a dynamic-scaling Y-axis coordinate configuration grid.
+ */
+function initNetworkChart() {
+  const ctx = document.getElementById('networkGraph').getContext('2d');
+
+  netChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: 'Upload Mbps',
+          data: [],
+          borderColor: 'green'
+        },
+        {
+          label: 'Download Mbps',
+          data: [],
+          borderColor: 'orange'
+        }
+      ]
+    },
+    options: {
+      animation: false
+    }
+  });
+}
+
+/**
+ * Logic Module: Network Graph Stream Processor
+ * Tracks real-time network usage logs across dual line channels while preserving standard FIFO truncation rules.
+ */
+function updateNetworkChart(up, down) {
+  const time = new Date().toLocaleTimeString();
+
+  netChart.data.labels.push(time);
+  netChart.data.datasets[0].data.push(up);
+  netChart.data.datasets[1].data.push(down);
+
+  if (netChart.data.labels.length > 20) {
+    netChart.data.labels.shift();
+    netChart.data.datasets.forEach(d => d.data.shift());
+  }
+
+  netChart.update();
+}
+
+/**
+ * Functional Routine: Network Pipeline
+ * Intercepts cumulative network byte counters to compute differences between intervals ($dt$).
+ * Converts delta indexes from raw bytes into Megabits per second ($\text{Mbps} = \frac{\Delta\text{bytes} \times 8}{1024 \times 1024}$) for accurate bandwidth metering.
+ */
+function fetchNetwork() {
+  fetch('http://10.69.0.2:5000/api/network')
+    .then(r => r.json())
+    .then(data => {
+
+      const now = Date.now();
+      const dt = (now - lastTime) / 1000; // Establishes temporal elapsed slice quotient to handle fluctuating poll latency offsets
+
+      // Derives byte payload difference metrics over the precise time window delta
+      const up = (data.bytes_sent - lastBytesSent) / dt;
+      const down = (data.bytes_recv - lastBytesRecv) / dt;
+
+      // Resets reference global states for calculations in subsequent loop intervals
+      lastBytesSent = data.bytes_sent;
+      lastBytesRecv = data.bytes_recv;
+      lastTime = now;
+
+      // Bitwise processing formula converting bits-to-bytes into standard Megabit bandwidth classifications
+      const uploadMbps = (up * 8 / 1024 / 1024).toFixed(2);
+      const downloadMbps = (down * 8 / 1024 / 1024).toFixed(2);
+
+      document.getElementById('network-usage').innerText =
+        `${uploadMbps} Mbps ↑ / ${downloadMbps} Mbps ↓`;
+
+      if (!netChart) initNetworkChart();
+
+      updateNetworkChart(uploadMbps, downloadMbps);
+    });
+}
+
+// ---------- SYNCHRONOUS TELEMETRY ENGINE ORCHESTRATION ----------
+
+/**
+ * Master Execution Directive: Orchestrates data gathering passes across independent 
+ * subsystem endpoints to update DOM elements simultaneously.
+ */
+function updateAll() {
+  fetchTemperature();
+  fetchCPU();
+  fetchMemory();
+  fetchNetwork();
+}
+
+// Operational Init Sequence: Executes standard first-pass queries immediately upon parsing lifecycle closure
+updateAll();
+
+// Background Telemetry Interval Loop: Schedules ongoing collection passes at a continuous 2000ms (2-second) heartbeat cadence
+setInterval(updateAll, 2000);
+</script>
+
 </body>
 </html>
