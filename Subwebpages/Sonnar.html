@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Titan's Cockpit</title>
+  <title>Titan's Plex Media Server</title>
   <link rel="stylesheet" href="../CSS/styles.css"/>
   <style>
     /* Quick custom style adjustment for this specific embedded frame view */
@@ -35,15 +36,15 @@
 
     <div class="topbar">
       <div>
-        <strong>Cockpit Monitoring Panel</strong>
+        <strong>Sonnar</strong>
       </div>
     </div>
 
     <div class="grid">
       <div class="card col-12 embedded-container">
         <iframe 
-          src="https://10.69.0.2:9090/" 
-          title="Live Cockpit Panel"
+          src="" 
+          title="Sonnar Panel"
           class="embedded-frame">
         </iframe>
       </div>
@@ -53,30 +54,20 @@
 </div>
 
 <script>
-    // Dynamically look inside the current directory path for the SideNavigation components
-    fetch('./SideNavigation/sidebar.html') 
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.statusText);
-            }
-            return response.text();
-        })
+    fetch('/SideNavigation/sidebar.html') 
+        .then(response => response.text())
         .then(data => {
             document.getElementById('sidebar-container').innerHTML = data;
 
-            // 1. Get the clean, lowercase page name
             let currentPage = window.location.pathname.split('/').pop().toLowerCase();
-            if (currentPage === "" || currentPage === "overview") {
-                currentPage = "overview.html"; // Default fallback match
+            if (currentPage === "") {
+                currentPage = "overview.html";
             }
 
-            // 2. Find all your navigation links
             const navLinks = document.querySelectorAll('.sidebar-link');
 
             navLinks.forEach(link => {
                 const targetPage = link.getAttribute('href').split('/').pop().toLowerCase();
-                
-                // 3. Find the inner nav item container
                 const navItem = link.querySelector('.nav-item');
                 
                 if (navItem) {
