@@ -1,3 +1,6 @@
+Its called Titanic makes cool dashboard. For the rest I Ai generated it .. will actually make a readme later. 
+
+
 # Titan's Overview 🚀
 
 Titan's Overview is a lightweight, real-time hardware telemetry dashboard. It features a responsive, glassmorphic frontend UI powered by **Chart.js** and an asynchronous **Flask** backend engine utilizing **psutil** to extract deep system metrics (CPU core splits, thermals, virtual memory footprints, and network interface velocities).
