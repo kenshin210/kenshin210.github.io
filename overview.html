@@ -26,7 +26,7 @@
 
       <div class="card col-3">
         <h3>CPU Usage</h3>
-        <div class="value" id="cpu-usage">--%</div>
+        <div class="value" id="cpu-usage">--%</div> //links to javascript which pulls the cpu usage from flask, the id is what this pulls from the javascript to identify what information is tracked. 
       </div>
 
       <div class="card col-3">
@@ -54,17 +54,17 @@
       </div>
 
       <div class="card col-3">
-        <h3>GPU Temp</h3>
+        <h3>GPU Temp</h3> // will update this once i have a gpu on my server
         <div id="gpu-temp-display">--°C</div>
       </div>
 
       <div class="card col-3">
-        <h3>VRAM Usage</h3>
+        <h3>VRAM Usage</h3> // will update this once i have a gpu on my server
         <div id="vram-usage">--%</div>
       </div>
 
       <div class="card col-3">
-        <h3>Memory Used</h3>
+        <h3>Memory Used</h3> // will update this once i have a gpu on my server will most likely be changed later to being Disk usage or something i dont know yet. Shouldve got ai to write all comments
         <div id="memory-percent">-- GB</div>
       </div>
 
@@ -88,7 +88,7 @@
 
       <div class="card col-6">
         <h3>GPU Load</h3>
-        <canvas id="gpuGraph" height="100"></canvas>
+        <canvas id="gpuGraph" height="100"></canvas>  /* will update this once i have a gpu on my server */
       </div>
 
       <div class="card col-6">
@@ -100,7 +100,7 @@
 
     <div class="grid">
       <div class="card col-12">
-        <h3>Alerts</h3>
+        <h3>Alerts</h3> // will fix this later
         <p class="badge warning"></p><br>
         <p class="badge success"></p><br>
         <p class="badge danger"></p>
@@ -111,11 +111,7 @@
 </div>
 
 <script>
-/**
- * Component Injection Module: Navigation Architecture 
- * Asynchronously pulls shared, central sidebar source markup to update navigation 
- * blocks modularly across multi-page layouts without replicating static code.
- */
+// AI over complicated it, litterally just fetches the html inside the navigation folder., Ai being high not supprised.
 fetch('./SideNavigation/sidebar.html')
   .then(r => r.text())
   .then(html => {
@@ -133,9 +129,7 @@ let lastBytesRecv = 0;
 let lastTime = Date.now();
 
 /**
- * Functional Routine: Thermals Aggregator
- * Dispatches an asynchronous request to target node server to parse core motherboard packaging 
- * thermal telemetry data, formatting the resulting floating-point values into localized UI elements.
+ it just fetches the temperature of the cpu from python why over complicate this.. 
  */
 function fetchTemperature() {
   fetch('http://10.69.0.2:5000/api/temp')
@@ -150,9 +144,8 @@ function fetchTemperature() {
 let cpuChart; // Keeps global lifecycle context handler for the active ChartJS CPU interface pointer
 
 /**
- * Logic Module: CPU Graphic Allocator
- * Constructs a multi-dataset Chart.js line framework mapped precisely to host layout cores.
- * Colors elements across a spectrum using HSL distribution steps to visually separate cores.
+Litterally just a chart.js line framework mapped to a the servers layout of cores, colours were just so i could see which cores were being clobered so i can alter the cpu pinning.
+
  */
 function initCPUChart(coreCount) {
   const ctx = document.getElementById('cpuGraph').getContext('2d');
@@ -164,21 +157,21 @@ function initCPUChart(coreCount) {
       datasets: Array.from({ length: coreCount }, (_, i) => ({
         label: `Core ${i}`,
         data: [],
-        borderColor: `hsl(${i * 40}, 80%, 50%)`, // Automatically steps line hue bounds relative to thread totals
+        borderColor: `hsl(${i * 40}, 80%, 50%)`, // Just changes the hue of the lines... 
         tension: 0.3
       }))
     },
     options: {
-      animation: false, // Disables configuration animations to conserve browser performance during high-frequency telemetry cycles
-      scales: { y: { min: 0, max: 100 } } // Locks the coordinate graph to a rigid 0-100 percentage viewport boundary
+      animation: false, // disables animations as i crashed another pc by accident , not sure what ai was on about
+      scales: { y: { min: 0, max: 100 } } // Locks the coordinate graph to a rigid 0-100 percentage viewport boundary, enh this is correct
     }
   });
 }
 
 /**
- * Logic Module: CPU Graph Stream Processor
- * Injects latest temporal tags and multi-core metrics down individual plot arrays.
- * Employs a rolling First-In, First-Out (FIFO) buffer mechanism tracking 20 index periods to truncate trailing data points.
+its just Graph stream 
+its first in firt out mech with temporal tag ai over complicated this to.. i aint that smart 
+
  */
 function updateCPUChart(perCore) {
   const time = new Date().toLocaleTimeString();
@@ -189,19 +182,17 @@ function updateCPUChart(perCore) {
     cpuChart.data.datasets[i].data.push(v);
   });
 
-  // Rolling cache management: drops outdated indexes to limit browser footprint leaks
+  // Rolling cache management: drops outdated indexes to limit browser footprint leaks, this was pretty accurate
   if (cpuChart.data.labels.length > 20) {
     cpuChart.data.labels.shift();
     cpuChart.data.datasets.forEach(d => d.data.shift());
   }
 
-  cpuChart.update(); // Signals ChartJS view layout re-renders with fresh internal data coordinates
+  cpuChart.update(); // Signals ChartJS view layout to re-render data. 
 }
 
 /**
- * Functional Routine: Central Processor Pipeline
- * Queries global utilization parameters; handles lazy-initialization logic maps 
- * if core count configurations are undefined upon primary payload arrivals.
+Its a fetch.
  */
 function fetchCPU() {
   fetch('http://10.69.0.2:5000/api/cpu')
@@ -218,7 +209,7 @@ function fetchCPU() {
     });
 }
 
-// ---------- VOLATILE MEMORY ALLOCATIONS SUBMODULE ----------
+
 let memChart; // Keeps global lifecycle context handler for the active ChartJS Memory interface pointer
 
 /**
@@ -247,8 +238,7 @@ function initMemoryChart() {
 }
 
 /**
- * Logic Module: RAM Graph Stream Processor
- * Appends localized operational values down the memory data register, slicing indexes past threshold boundaries.
+
  */
 function updateMemoryChart(val) {
   const time = new Date().toLocaleTimeString();
@@ -265,9 +255,7 @@ function updateMemoryChart(val) {
 }
 
 /**
- * Functional Routine: Volatile Memory Pipeline
- * Controls raw byte transformations ($1024^3$ binary scaling) to parse standard metrics 
- * into readable Gigabyte (GB) layout labels, adjusting proportional utilization bars dynamically.
+
  */
 function fetchMemory() {
   fetch('http://10.69.0.2:5000/api/memory')
@@ -278,9 +266,9 @@ function fetchMemory() {
       document.getElementById('memory-percent').innerText =
         data.percent.toFixed(1) + '%';
 
-      // Transforms base server numerical bytes arrays directly into Gigabyte strings via standard binary bitwise scaling steps
+      // converts to gb and allows to have both data used an data total ( litterally just the used ram and total to be shown with GB and the / in the middle  i broke this multiple times .. )
       document.getElementById('memory-gb').innerText =
-        `${(data.used / 1024**3).toFixed(2)} GB / ${(data.total / 1024**3).toFixed(2)} GB `;
+        `${(data.used / 1024**3).toFixed(2)} GB / ${(data.total / 1024**3).toFixed(2)} GB `; 
 
       if (!memChart) initMemoryChart();
 
@@ -288,13 +276,11 @@ function fetchMemory() {
     });
 }
 
-// ---------- ASYNCHRONOUS NETWORK PIPELINE SUBMODULE ----------
-let netChart; // Keeps global lifecycle context handler for the active ChartJS Network interface pointer
+
+let netChart; // its the same as earlier.. just for networks
 
 /**
- * Logic Module: Network Graphic Allocator
- * Maps independent multi-tiered tracking lines splitting Upload and Download streams 
- * inside a dynamic-scaling Y-axis coordinate configuration grid.
+Tracking lines for up load an download ai over complicated this
  */
 function initNetworkChart() {
   const ctx = document.getElementById('networkGraph').getContext('2d');
@@ -323,8 +309,7 @@ function initNetworkChart() {
 }
 
 /**
- * Logic Module: Network Graph Stream Processor
- * Tracks real-time network usage logs across dual line channels while preserving standard FIFO truncation rules.
+Network graph 
  */
 function updateNetworkChart(up, down) {
   const time = new Date().toLocaleTimeString();
@@ -343,8 +328,8 @@ function updateNetworkChart(up, down) {
 
 /**
  * Functional Routine: Network Pipeline
- * Intercepts cumulative network byte counters to compute differences between intervals ($dt$).
- * Converts delta indexes from raw bytes into Megabits per second ($\text{Mbps} = \frac{\Delta\text{bytes} \times 8}{1024 \times 1024}$) for accurate bandwidth metering.
+ * Network byte counters to compute differences between intervals ($dt$).
+Same as i did with the non chart, 
  */
 function fetchNetwork() {
   fetch('http://10.69.0.2:5000/api/network')
@@ -352,18 +337,18 @@ function fetchNetwork() {
     .then(data => {
 
       const now = Date.now();
-      const dt = (now - lastTime) / 1000; // Establishes temporal elapsed slice quotient to handle fluctuating poll latency offsets
+      const dt = (now - lastTime) / 1000; // poll latency offsets
 
-      // Derives byte payload difference metrics over the precise time window delta
+      // Metrics over time with a constance
       const up = (data.bytes_sent - lastBytesSent) / dt;
       const down = (data.bytes_recv - lastBytesRecv) / dt;
 
-      // Resets reference global states for calculations in subsequent loop intervals
+      // 
       lastBytesSent = data.bytes_sent;
       lastBytesRecv = data.bytes_recv;
       lastTime = now;
 
-      // Bitwise processing formula converting bits-to-bytes into standard Megabit bandwidth classifications
+      // math bits to kilobits to megabits , what were you expecting ?
       const uploadMbps = (up * 8 / 1024 / 1024).toFixed(2);
       const downloadMbps = (down * 8 / 1024 / 1024).toFixed(2);
 
@@ -378,9 +363,7 @@ function fetchNetwork() {
 
 // ---------- SYNCHRONOUS TELEMETRY ENGINE ORCHESTRATION ----------
 
-/**
- * Master Execution Directive: Orchestrates data gathering passes across independent 
- * subsystem endpoints to update DOM elements simultaneously.
+/**Literally just a fetch.. ai made this sound cool but its just a fetch .. 
  */
 function updateAll() {
   fetchTemperature();
@@ -392,7 +375,7 @@ function updateAll() {
 // Operational Init Sequence: Executes standard first-pass queries immediately upon parsing lifecycle closure
 updateAll();
 
-// Background Telemetry Interval Loop: Schedules ongoing collection passes at a continuous 2000ms (2-second) heartbeat cadence
+// Schedules ongoing collection passes at a continuous 2-second intervals
 setInterval(updateAll, 2000);
 </script>
 
