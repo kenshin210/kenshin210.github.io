@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Titan's Plex Media Server</title>
+  <title>Titan's Prowlarr Panel</title>
   <link rel="stylesheet" href="../CSS/styles.css"/>
   <style>
     /* Quick custom style adjustment for this specific embedded frame view */
@@ -43,7 +43,7 @@
     <div class="grid">
       <div class="card col-12 embedded-container">
         <iframe 
-          src="" 
+          src="http://10.69.0.2:9696" 
           title="Prowlarr Panel"
           class="embedded-frame">
         </iframe>
@@ -52,26 +52,40 @@
 
   </main>
 </div>
-
 <script>
-    fetch('/SideNavigation/sidebar.html') 
-        .then(response => response.text())
+    // 1. Force the fetch to use an absolute path so it always finds the file
+    fetch('/Overview/SideNavigation/sidebar.html') 
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.text();
+        })
         .then(data => {
             document.getElementById('sidebar-container').innerHTML = data;
 
+            // 2. Get the clean, lowercase current filename
             let currentPage = window.location.pathname.split('/').pop().toLowerCase();
             if (currentPage === "") {
                 currentPage = "overview.html";
             }
 
+            // 3. Find all your navigation links
             const navLinks = document.querySelectorAll('.sidebar-link');
 
             navLinks.forEach(link => {
-                const targetPage = link.getAttribute('href').split('/').pop().toLowerCase();
+                const hrefAttr = link.getAttribute('href');
+                if (!hrefAttr) return;
+
+                // Safe extraction of the filename, skipping external URLs like Cockpit
+                const pathParts = hrefAttr.split('/');
+                const targetPage = pathParts[pathParts.length - 1].toLowerCase();
+                
                 const navItem = link.querySelector('.nav-item');
                 
                 if (navItem) {
-                    if (currentPage === targetPage) {
+                    // Check if the current filename matches the link destination target
+                    if (currentPage === targetPage && !hrefAttr.startsWith('http')) {
                         navItem.classList.add('active');
                     } else {
                         navItem.classList.remove('active');
