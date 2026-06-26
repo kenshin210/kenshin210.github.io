@@ -38,7 +38,7 @@
 
 /* Root Viewport Context */
 html, body {
-  height: 100%;           /* Assures full-bleed viewport heights */
+  height: 105%;           /* Assures full-bleed viewport heights */
   font-family: var(--font);
   background: var(--background);
   background-image: var(--background-image);
@@ -91,7 +91,7 @@ html, body {
 
 /* Primary Data/View Stream */
 .main {
-  padding: 20px;
+  padding: 10px;
   display: flex;
   flex-direction: column; /* Stacks topbar and widget grid vertically */
   gap: var(--gap);
