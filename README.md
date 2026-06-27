@@ -1,6 +1,6 @@
 # Titanic's Overview 🚀
 
-Titan's Overview is a lightweight, real-time hardware telemetry dashboard. It features a responsive, glassmorphic frontend UI powered by **Chart.js** and an asynchronous **Flask** backend engine utilizing **psutil** to extract deep system metrics (CPU core splits, thermals, virtual memory footprints, and network interface velocities).Well also linking all subwebpages into one. 
+Titanic's Overview is a lightweight, real-time hardware telemetry dashboard. It features a responsive, glassmorphic frontend UI powered by **Chart.js** and an asynchronous **Flask** backend engine utilizing **psutil** to extract deep system metrics (CPU core splits, thermals, virtual memory footprints, and network interface velocities).Well also linking all subwebpages into one. 
 
 
 
@@ -56,6 +56,17 @@ Sonarr
 QBitTorrent
 
 Unifi
+
+
+
+To be added:
+-Alerts (will be on critical and errors just to reduce overhead)
+-Harddrive monitoring
+-Design of the whole lab using Visio( Will include CPU core pinning)
+-Pre-requisites
+
+
+
 
 
 This is deployed on Arch with Endevouros currently with LTS 
