@@ -64,14 +64,21 @@ To be added:
 -Harddrive monitoring
 -Design of the whole lab using Visio( Will include CPU core pinning)
 -Pre-requisites
+-Remove AI writting
+
+To Adjust:
+Overview Page
+Reduce clutter , change CPU load by core to bar graph (isolating this from being spagetthi)
+change the timing increments to 1 minute increments (Remove the x axis have seconds)
+Add logging it self as a back end instead of being instantly in your face
 
 
 
 
-
-This is deployed on Arch with Endevouros currently with LTS 
+ 
 
 Specs On Homelab currently:
+This is deployed on Arch with Endevouros currently with LTS
 2 x Intel Xeon E5-2680v4 
 32Gb (2x16Gb) HPE 16GB PC4-2133 Load Reduced DIMMs
 2 x 800W PSU
