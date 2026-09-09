@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Titan's Jellyfin Media Server</title>
+  <link rel="stylesheet" href="../CSS/styles.css"/>
+  <style>
+    /* Quick custom style adjustment for this specific embedded frame view */
+    .embedded-container {
+      width: 100%;
+      height: calc(100vh - 120px); /* Fills the rest of the screen below topbar */
+      border: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #000000;
+      box-shadow: var(--shadow);
+    }
+
+    .embedded-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <div id="sidebar-container"></div>
+  
+  <main class="main">
+
+    <div class="topbar">
+      <div>
+        <strong>Plex Media Server</strong>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card col-12 embedded-container">
+        <iframe 
+          src="http://10.69.0.2:8096" 
+          title="Jellyfin Panel"
+          class="embedded-frame">
+        </iframe>
+      </div>
+    </div>
+
+  </main>
+</div>
+<script>
+    // 1. Force the fetch to use an absolute path so it always finds the file
+    fetch('/Overview/SideNavigation/sidebar.html') 
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('sidebar-container').innerHTML = data;
+
+            // 2. Get the clean, lowercase current filename
+            let currentPage = window.location.pathname.split('/').pop().toLowerCase();
+            if (currentPage === "") {
+                currentPage = "overview.html";
+            }
+
+            // 3. Find all your navigation links
+            const navLinks = document.querySelectorAll('.sidebar-link');
+
+            navLinks.forEach(link => {
+                const hrefAttr = link.getAttribute('href');
+                if (!hrefAttr) return;
+
+                // Safe extraction of the filename, skipping external URLs like Cockpit
+                const pathParts = hrefAttr.split('/');
+                const targetPage = pathParts[pathParts.length - 1].toLowerCase();
+                
+                const navItem = link.querySelector('.nav-item');
+                
+                if (navItem) {
+                    // Check if the current filename matches the link destination target
+                    if (currentPage === targetPage && !hrefAttr.startsWith('http')) {
+                        navItem.classList.add('active');
+                    } else {
+                        navItem.classList.remove('active');
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error loading the sidebar:', error));
+</script>
+
+</body>
+</html>
